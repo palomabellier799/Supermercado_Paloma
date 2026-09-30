@@ -1,0 +1,24 @@
+{
+  "name": "sistema-stock-paloma",
+  "version": "1.0.0",
+  "description": "Sistema de gestión de stock y fidelización",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "init": "node initDatabase.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "csv-parser": "^3.2.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.2",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0"
+  },
+  "keywords": ["stock", "inventory", "fidelization", "nodejs", "express"],
+  "author": "Sistema Stock Paloma",
+  "license": "MIT"
+}

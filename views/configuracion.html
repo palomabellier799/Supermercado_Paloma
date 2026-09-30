@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración del Sistema - Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #655df6;
+      --primary-hover: #4638de;
+      --secondary-color: #10b981;
+      --secondary-hover: #059669;
+      --danger-color: #331458;
+      --warning-color: #6f10af;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --bg-light: #f9fafb;
+      --card-bg: #ffffff;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --border-color: #e5e7eb;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      color: var(--text-dark);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .header h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+    
+    .back-button:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+    
+    .config-card {
+      background-color: var(--card-bg);
+      border-radius: 1rem;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .config-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    
+    .config-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .config-icon {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--text-dark);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    
+    .form-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      background-color: white;
+      cursor: pointer;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      text-decoration: none;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .btn-success {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background-color: var(--secondary-hover);
+    }
+    
+    .btn-warning {
+      background-color: var(--warning-color);
+      color: white;
+    }
+    
+    .btn-warning:hover {
+      background-color: #830ca7;
+    }
+    
+    .btn-danger {
+      background-color: var(--danger-color);
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background-color: #3a1641;
+    }
+    
+    .btn-full {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .status-message {
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    
+    .status-success {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+    
+    .status-error {
+      background-color: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+    
+    .users-list {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+    }
+    
+    .user-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .user-item:last-child {
+      border-bottom: none;
+    }
+    
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .user-name {
+      font-weight: 500;
+      color: var(--text-dark);
+    }
+    
+    .user-role {
+      font-size: 0.875rem;
+      color: var(--text-light);
+    }
+    
+    .role-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    
+    .role-cajero {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+    
+    .role-supervisor {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .role-admin {
+      background-color: #fecaca;
+      color: #b91c1c;
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .config-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .config-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="header">
+      <h1><i class="fas fa-cog"></i> Configuración del Sistema</h1>
+      <a href="/dashboard" class="back-button">
+        <i class="fas fa-arrow-left"></i> Volver al Dashboard
+      </a>
+    </div>
+    
+    <div class="config-grid">
+      <!-- Gestión de Usuarios -->
+      <div class="config-card">
+        <h2 class="config-title">
+          <i class="fas fa-users config-icon"></i>
+          Gestión de Usuarios
+        </h2>
+        
+        <div id="userMessage" class="status-message" style="display: none;"></div>
+        
+        <div class="form-group">
+          <label class="form-label">Usuario</label>
+          <input type="text" id="newUser" class="form-input" placeholder="Nombre de usuario">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Contraseña</label>
+          <input type="password" id="newPassword" class="form-input" placeholder="Contraseña">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Rol</label>
+          <select id="newRole" class="form-select">
+            <option value="cajero">Cajero</option>
+            <option value="supervisor">Supervisor</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        
+        <button onclick="crearUsuario()" class="btn btn-success btn-full">
+          <i class="fas fa-user-plus"></i> Crear Usuario
+        </button>
+        
+        <div style="margin-top: 2rem;">
+          <h3 style="margin-bottom: 1rem; color: var(--text-dark);">Usuarios Existentes</h3>
+          <div id="usersList" class="users-list">
+            <!-- Los usuarios se cargarán aquí -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- Gestión de Productos -->
+      <div class="config-card">
+        <h2 class="config-title">
+          <i class="fas fa-box config-icon"></i>
+          Gestión de Productos
+        </h2>
+        
+        <div id="productMessage" class="status-message" style="display: none;"></div>
+        
+        <div class="form-group">
+          <label class="form-label">Código</label>
+          <input type="text" id="newCode" class="form-input" placeholder="Código del producto">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Nombre/Descripción</label>
+          <input type="text" id="newName" class="form-input" placeholder="Nombre del producto">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Stock Inicial</label>
+          <input type="number" id="newStock" class="form-input" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Precio</label>
+          <input type="number" id="newPrice" class="form-input" placeholder="0.00" min="0" step="0.01">
+        </div>
+        
+        <button onclick="crearProducto()" class="btn btn-primary btn-full">
+          <i class="fas fa-plus"></i> Agregar Producto
+        </button>
+        
+        <button onclick="actualizarStock()" class="btn btn-warning btn-full" style="margin-top: 1rem;">
+          <i class="fas fa-sync"></i> Actualizar desde CSV
+        </button>
+
+        <div class="form-group" style="margin-top: 1rem;">
+          <label class="form-label" style="display:inline-flex; align-items:center; gap:.4rem;">
+            <input type="checkbox" id="filtroSinPrecio" /> Mostrar solo productos sin precio
+          </label>
+        </div>
+
+        <div id="tablaProductos" style="margin-top: 1rem;"></div>
+      </div>
+      
+      <!-- Gestión de Clientes -->
+      <div class="config-card">
+        <h2 class="config-title">
+          <i class="fas fa-user-friends config-icon"></i>
+          Gestión de Clientes
+        </h2>
+        
+        <div id="clientMessage" class="status-message" style="display: none;"></div>
+        
+        <div class="form-group">
+          <label class="form-label">Nombre</label>
+          <input type="text" id="newClientName" class="form-input" placeholder="Nombre completo">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">DNI</label>
+          <input type="text" id="newClientDni" class="form-input" placeholder="DNI">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Teléfono</label>
+          <input type="text" id="newClientPhone" class="form-input" placeholder="Teléfono">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="newClientEmail" class="form-input" placeholder="Email">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Domicilio</label>
+          <input type="text" id="newClientAddress" class="form-input" placeholder="Domicilio">
+        </div>
+        
+        <button onclick="crearCliente()" class="btn btn-primary btn-full">
+          <i class="fas fa-user-plus"></i> Agregar Cliente
+        </button>
+      </div>
+      
+      <!-- Herramientas del Sistema -->
+      <div class="config-card">
+        <h2 class="config-title">
+          <i class="fas fa-tools config-icon"></i>
+          Herramientas del Sistema
+        </h2>
+        
+        <div id="systemMessage" class="status-message" style="display: none;"></div>
+        
+        <button onclick="backupDatabase()" class="btn btn-success btn-full">
+          <i class="fas fa-download"></i> Respaldar Base de Datos
+        </button>
+        
+        <button onclick="limpiarLogs()" class="btn btn-warning btn-full" style="margin-top: 1rem;">
+          <i class="fas fa-trash"></i> Limpiar Logs del Sistema
+        </button>
+        
+        <button onclick="reiniciarSistema()" class="btn btn-danger btn-full" style="margin-top: 1rem;">
+          <i class="fas fa-power-off"></i> Reiniciar Sistema
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Cargar usuarios al iniciar
+    document.addEventListener('DOMContentLoaded', function() {
+      cargarUsuarios();
+    });
+
+    // Función para mostrar mensajes
+    function mostrarMensaje(elementId, mensaje, tipo) {
+      const element = document.getElementById(elementId);
+      element.textContent = mensaje;
+      element.className = `status-message status-${tipo}`;
+      element.style.display = 'block';
+      
+      setTimeout(() => {
+        element.style.display = 'none';
+      }, 5000);
+    }
+
+    // Gestión de Usuarios
+    async function crearUsuario() {
+      const usuario = document.getElementById('newUser').value.trim();
+      const contraseña = document.getElementById('newPassword').value.trim();
+      const rol = document.getElementById('newRole').value;
+
+      if (!usuario || !contraseña) {
+        mostrarMensaje('userMessage', 'Por favor complete todos los campos', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch('/configuracion/usuarios', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ usuario, contraseña, rol })
+        });
+
+        if (response.ok) {
+          mostrarMensaje('userMessage', 'Usuario creado exitosamente', 'success');
+          document.getElementById('newUser').value = '';
+          document.getElementById('newPassword').value = '';
+          cargarUsuarios();
+        } else {
+          const error = await response.text();
+          mostrarMensaje('userMessage', error, 'error');
+        }
+      } catch (error) {
+        mostrarMensaje('userMessage', 'Error al crear usuario', 'error');
+      }
+    }
+
+    async function cargarUsuarios() {
+      try {
+        const response = await fetch('/configuracion/usuarios');
+        const usuarios = await response.json();
+        
+        const container = document.getElementById('usersList');
+        container.innerHTML = '';
+        
+        usuarios.forEach(usuario => {
+          const userItem = document.createElement('div');
+          userItem.className = 'user-item';
+          
+          const roleClass = `role-${usuario.rol}`;
+          
+          userItem.innerHTML = `
+            <div class="user-info">
+              <div class="user-name">${usuario.usuario}</div>
+              <div class="user-role">
+                <span class="role-badge ${roleClass}">${usuario.rol}</span>
+              </div>
+            </div>
+            <button onclick="eliminarUsuario('${usuario.usuario}')" class="btn btn-danger" style="padding: 0.5rem;">
+              <i class="fas fa-trash"></i>
+            </button>
+          `;
+          
+          container.appendChild(userItem);
+        });
+      } catch (error) {
+        console.error('Error al cargar usuarios:', error);
+      }
+    }
+
+    async function eliminarUsuario(usuario) {
+      if (!confirm(`¿Está seguro de eliminar al usuario ${usuario}?`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/configuracion/usuarios/${usuario}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          mostrarMensaje('userMessage', 'Usuario eliminado exitosamente', 'success');
+          cargarUsuarios();
+        } else {
+          const error = await response.text();
+          mostrarMensaje('userMessage', error, 'error');
+        }
+      } catch (error) {
+        mostrarMensaje('userMessage', 'Error al eliminar usuario', 'error');
+      }
+    }
+
+    // Gestión de Productos
+    async function crearProducto() {
+      const codigo = document.getElementById('newCode').value.trim();
+      const nombre = document.getElementById('newName').value.trim();
+      const stock = parseInt(document.getElementById('newStock').value) || 0;
+      const precio = parseFloat(document.getElementById('newPrice').value) || 0;
+
+      if (!codigo || !nombre) {
+        mostrarMensaje('productMessage', 'Por favor complete código y nombre', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch('/configuracion/productos', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ codigo, nombre, stock, precio })
+        });
+
+        if (response.ok) {
+          mostrarMensaje('productMessage', 'Producto creado exitosamente', 'success');
+          document.getElementById('newCode').value = '';
+          document.getElementById('newName').value = '';
+          document.getElementById('newStock').value = '';
+          document.getElementById('newPrice').value = '';
+        } else {
+          const error = await response.text();
+          mostrarMensaje('productMessage', error, 'error');
+        }
+      } catch (error) {
+        mostrarMensaje('productMessage', 'Error al crear producto', 'error');
+      }
+    }
+
+    // Listado de productos con edición de precio
+    document.addEventListener('DOMContentLoaded', () => {
+      const cb = document.getElementById('filtroSinPrecio');
+      if (cb) cb.addEventListener('change', cargarProductos);
+      cargarProductos();
+    });
+    async function cargarProductos() {
+      try {
+        const sinPrecio = document.getElementById('filtroSinPrecio')?.checked ? '1' : '0';
+        const res = await fetch('/configuracion/productos?sinPrecio=' + sinPrecio);
+        const productos = await res.json();
+        const tabla = document.getElementById('tablaProductos');
+        if (!productos || productos.length === 0) {
+          tabla.innerHTML = '<div class="status-message">No hay productos para mostrar con el filtro actual.</div>';
+          return;
+        }
+        const rows = productos.map(p => `
+            <tr>
+              <td style='padding:.5rem;'>${p.codigo}</td>
+              <td style='padding:.5rem;'>${p.nombre}</td>
+              <td style='padding:.5rem; text-align:right;'>${p.stock}</td>
+              <td style='padding:.5rem; text-align:right;'><input type='number' step='0.01' min='0' value='${Number(p.precio||0).toFixed(2)}' id='precio_${p.codigo}' style='width:100px;' /></td>
+              <td style='padding:.5rem; text-align:center;'><button class='btn btn-success' onclick='guardarPrecio("${p.codigo}")'>Guardar</button></td>
+            </tr>`).join('');
+        tabla.innerHTML = `
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="text-align:left; padding:.5rem;">Código</th>
+                <th style="text-align:left; padding:.5rem;">Nombre</th>
+                <th style="text-align:right; padding:.5rem;">Stock</th>
+                <th style="text-align:right; padding:.5rem;">Precio</th>
+                <th style="padding:.5rem;">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>`;
+      } catch (e) {
+        console.error('Error al cargar productos:', e);
+      }
+    }
+    async function guardarPrecio(codigo) {
+      const val = parseFloat(document.getElementById('precio_' + codigo).value)||0;
+      const r = await fetch('/configuracion/productos/precio', { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ codigo, precio: val }) });
+      if (r.ok) {
+        mostrarMensaje('productMessage', 'Precio actualizado', 'success');
+      } else {
+        const t = await r.text();
+        mostrarMensaje('productMessage', t, 'error');
+      }
+    }
+
+    async function actualizarStock() {
+      try {
+        const response = await fetch('/configuracion/actualizar-stock', {
+          method: 'POST'
+        });
+
+        if (response.ok) {
+          mostrarMensaje('productMessage', 'Stock actualizado desde CSV exitosamente', 'success');
+        } else {
+          const error = await response.text();
+          mostrarMensaje('productMessage', error, 'error');
+        }
+      } catch (error) {
+        mostrarMensaje('productMessage', 'Error al actualizar stock', 'error');
+      }
+    }
+
+    // Gestión de Clientes
+    async function crearCliente() {
+      const nombre = document.getElementById('newClientName').value.trim();
+      const dni = document.getElementById('newClientDni').value.trim();
+      const telefono = document.getElementById('newClientPhone').value.trim();
+      const email = document.getElementById('newClientEmail').value.trim();
+      const domicilio = document.getElementById('newClientAddress').value.trim();
+
+      if (!nombre || !dni) {
+        mostrarMensaje('clientMessage', 'Por favor complete nombre y DNI', 'error');
+        return;
+      }
+
+      try {
+        const response = await fetch('/configuracion/clientes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ nombre, dni, telefono, email, domicilio })
+        });
+
+        if (response.ok) {
+          mostrarMensaje('clientMessage', 'Cliente creado exitosamente', 'success');
+          document.getElementById('newClientName').value = '';
+          document.getElementById('newClientDni').value = '';
+          document.getElementById('newClientPhone').value = '';
+          document.getElementById('newClientEmail').value = '';
+          document.getElementById('newClientAddress').value = '';
+        } else {
+          const error = await response.text();
+          mostrarMensaje('clientMessage', error, 'error');
+        }
+      } catch (error) {
+        mostrarMensaje('clientMessage', 'Error al crear cliente', 'error');
+      }
+    }
+
+    // Herramientas del Sistema
+    async function backupDatabase() {
+      try {
+        const response = await fetch('/configuracion/backup', {
+          method: 'POST'
+        });
+
+        if (response.ok) {
+          mostrarMensaje('systemMessage', 'Respaldo creado exitosamente', 'success');
+        } else {
+          const error = await response.text();
+          mostrarMensaje('systemMessage', error, 'error');
+        }
+      } catch (error) {
+        mostrarMensaje('systemMessage', 'Error al crear respaldo', 'error');
+      }
+    }
+
+    async function limpiarLogs() {
+      if (!confirm('¿Está seguro de limpiar todos los logs del sistema?')) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/configuracion/limpiar-logs', {
+          method: 'POST'
+        });
+
+        if (response.ok) {
+          mostrarMensaje('systemMessage', 'Logs limpiados exitosamente', 'success');
+        } else {
+          const error = await response.text();
+          mostrarMensaje('systemMessage', error, 'error');
+        }
+      } catch (error) {
+        mostrarMensaje('systemMessage', 'Error al limpiar logs', 'error');
+      }
+    }
+
+    async function reiniciarSistema() {
+      if (!confirm('¿Está seguro de reiniciar el sistema? Esto cerrará todas las sesiones activas.')) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/configuracion/reiniciar', {
+          method: 'POST'
+        });
+
+        if (response.ok) {
+          mostrarMensaje('systemMessage', 'Sistema reiniciado. Redirigiendo...', 'success');
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        } else {
+          const error = await response.text();
+          mostrarMensaje('systemMessage', error, 'error');
+        }
+      } catch (error) {
+        mostrarMensaje('systemMessage', 'Error al reiniciar sistema', 'error');
+      }
+    }
+  </script>
+</body>
+</html>
+

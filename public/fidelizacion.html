@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Fidelización - Sistema Stock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+     --primary-color:rgb(70, 131, 229);
+          --primary-hover:rgb(88, 74, 239);
+          --secondary-color: #10b981;
+          --secondary-hover: #059669;
+          --danger-color:rgb(234, 19, 19);
+          --text-dark:rgb(0, 1, 1);
+          --text-light:rgb(152, 159, 173);
+          --bg-light: #f9fafb;
+          --card-bg: #ffffff;
+          --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --border-color: #e5e7eb;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      color: var(--text-dark);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .app-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .header h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+    
+    .back-button:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .search-card {
+      background-color: var(--card-bg);
+      border-radius: 1rem;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .search-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--text-dark);
+    }
+    
+    .search-form {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .search-input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    
+    .search-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    .search-button:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .search-button.secondary {
+      background-color: var(--secondary-color);
+    }
+    
+    .search-button.secondary:hover {
+      background-color: var(--secondary-hover);
+    }
+    
+    .suggestions-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-top: none;
+      border-radius: 0 0 0.5rem 0.5rem;
+      box-shadow: var(--shadow);
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+    
+    .suggestion-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease;
+    }
+    
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+    
+    .suggestion-item:hover {
+      background-color: #f9fafb;
+    }
+    
+    .suggestion-name {
+      font-weight: 500;
+      color: var(--text-dark);
+    }
+    
+    .suggestion-dni {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      margin-top: 0.25rem;
+    }
+    
+    .suggestion-points {
+      font-size: 0.875rem;
+      color: var(--secondary-color);
+      font-weight: 500;
+      margin-top: 0.25rem;
+    }
+    
+    .results-card {
+      background-color: var(--card-bg);
+      border-radius: 1rem;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      overflow: hidden;
+    }
+    
+    .client-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .info-item {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .info-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-light);
+      margin-bottom: 0.25rem;
+    }
+    
+    .info-value {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+    
+    .points-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background-color: var(--secondary-color);
+      color: white;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 1.25rem;
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-light);
+    }
+    
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #d1d5db;
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .search-form {
+        flex-direction: column;
+      }
+      
+      .search-card, .results-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="header">
+      <h1><i class="fas fa-bullseye"></i> Panel de Fidelización</h1>
+      <a href="/dashboard" class="back-button">
+        <i class="fas fa-arrow-left"></i> Volver al inicio
+      </a>
+    </div>
+    
+    <div class="search-card">
+      <h2 class="search-title">Buscar Cliente</h2>
+      <div class="search-form">
+        <div style="position: relative; flex: 1;">
+          <input type="text" id="nombre" class="search-input" placeholder="Ingrese nombre del cliente" autofocus>
+          <div id="suggestions" class="suggestions-dropdown" style="display: none;"></div>
+        </div>
+        <button onclick="buscarPorNombre()" class="search-button">
+          <i class="fas fa-search"></i> Buscar por Nombre
+        </button>
+      </div>
+      <div class="search-form" style="margin-top: 1rem;">
+        <div style="position: relative; flex: 1;">
+          <input type="text" id="dni" class="search-input" placeholder="Ingrese DNI del cliente">
+          <div id="dniSuggestions" class="suggestions-dropdown" style="display: none;"></div>
+        </div>
+        <button onclick="buscarPorDni()" class="search-button secondary">
+          <i class="fas fa-id-card"></i> Buscar por DNI
+        </button>
+      </div>
+    </div>
+    
+    <div class="results-card">
+      <div id="resultado" style="display:none;">
+        <div class="client-info">
+          <div class="info-item">
+            <div class="info-label">Nombre</div>
+            <div class="info-value" id="nombreCliente"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">DNI</div>
+            <div class="info-value" id="dniCliente"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Teléfono</div>
+            <div class="info-value" id="telefono"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Email</div>
+            <div class="info-value" id="correo"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Domicilio</div>
+            <div class="info-value" id="domicilio"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Puntos de Fidelización</div>
+            <div class="points-badge" id="puntos"></div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Gasto mensual</div>
+            <div class="info-value" id="gastoMensual"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="mensaje" class="no-results" style="display: none;">
+        <i class="fas fa-search"></i>
+        <p>No se encontraron clientes que coincidan con tu búsqueda.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let searchTimeout;
+
+    // Función para mostrar sugerencias de autocompletado
+    function mostrarSugerencias(sugerencias, containerId) {
+      const container = document.getElementById(containerId);
+      
+      if (!sugerencias || sugerencias.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+      
+      container.innerHTML = '';
+      
+      sugerencias.forEach((sugerencia) => {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        item.innerHTML = `
+          <div class="suggestion-name">${sugerencia.nombre}</div>
+          <div class="suggestion-dni">DNI: ${sugerencia.dni}</div>
+          <div class="suggestion-points">Puntos: ${sugerencia.puntos}</div>
+        `;
+        
+        item.addEventListener('click', () => {
+          seleccionarSugerencia(sugerencia, containerId);
+        });
+        
+        container.appendChild(item);
+      });
+      
+      container.style.display = 'block';
+    }
+
+    // Función para seleccionar una sugerencia
+    function seleccionarSugerencia(sugerencia, containerId) {
+      if (containerId === 'suggestions') {
+        document.getElementById('nombre').value = sugerencia.nombre;
+        document.getElementById('suggestions').style.display = 'none';
+        mostrarCliente(sugerencia);
+      } else if (containerId === 'dniSuggestions') {
+        document.getElementById('dni').value = sugerencia.dni;
+        document.getElementById('dniSuggestions').style.display = 'none';
+        mostrarCliente(sugerencia);
+      }
+    }
+
+    // Función para mostrar información del cliente
+    function mostrarCliente(cliente) {
+      document.getElementById('resultado').style.display = "block";
+      document.getElementById('mensaje').style.display = "none";
+      document.getElementById('nombreCliente').textContent = cliente.nombre;
+      document.getElementById('dniCliente').textContent = cliente.dni;
+      document.getElementById('telefono').textContent = cliente.telefono || 'No especificado';
+      document.getElementById('correo').textContent = cliente.email || 'No especificado';
+      document.getElementById('domicilio').textContent = cliente.domicilio || 'No especificado';
+      document.getElementById('puntos').textContent = cliente.puntos || 0;
+      document.getElementById('gastoMensual').textContent = `$${Number(cliente.gasto_mensual||0).toFixed(2)}`;
+    }
+
+    // Función para buscar sugerencias por nombre
+    async function buscarSugerenciasPorNombre(nombre) {
+      if (nombre.length < 2) {
+        document.getElementById('suggestions').style.display = 'none';
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/fidelizacion/api/buscar?nombre=${encodeURIComponent(nombre)}&limit=5`);
+        const sugerencias = await response.json();
+        mostrarSugerencias(sugerencias, 'suggestions');
+      } catch (error) {
+        console.error('Error al buscar sugerencias:', error);
+        document.getElementById('suggestions').style.display = 'none';
+      }
+    }
+
+    // Función para buscar sugerencias por DNI
+    async function buscarSugerenciasPorDni(dni) {
+      if (dni.length < 2) {
+        document.getElementById('dniSuggestions').style.display = 'none';
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/fidelizacion/api/buscar?dni=${encodeURIComponent(dni)}&limit=5`);
+        const sugerencias = await response.json();
+        mostrarSugerencias(sugerencias, 'dniSuggestions');
+      } catch (error) {
+        console.error('Error al buscar sugerencias:', error);
+        document.getElementById('dniSuggestions').style.display = 'none';
+      }
+    }
+
+    // Función para buscar por nombre
+    async function buscarPorNombre() {
+      const nombre = document.getElementById('nombre').value.trim();
+      if (!nombre) {
+        alert('Por favor ingrese un nombre de cliente');
+        return;
+      }
+      
+      document.getElementById('suggestions').style.display = 'none';
+      
+      try {
+        const response = await fetch(`/fidelizacion/api/buscar?nombre=${encodeURIComponent(nombre)}`);
+        const clientes = await response.json();
+        
+        if (clientes && clientes.length > 0) {
+          mostrarCliente(clientes[0]);
+        } else {
+          document.getElementById('resultado').style.display = "none";
+          document.getElementById('mensaje').style.display = "block";
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('resultado').style.display = "none";
+        document.getElementById('mensaje').style.display = "block";
+      }
+    }
+
+    // Función para buscar por DNI
+    async function buscarPorDni() {
+      const dni = document.getElementById('dni').value.trim();
+      if (!dni) {
+        alert('Por favor ingrese un DNI');
+        return;
+      }
+      
+      document.getElementById('dniSuggestions').style.display = 'none';
+      
+      try {
+        const response = await fetch(`/fidelizacion/api/cliente?dni=${encodeURIComponent(dni)}`);
+        
+        if (response.ok) {
+          const cliente = await response.json();
+          mostrarCliente(cliente);
+        } else {
+          document.getElementById('resultado').style.display = "none";
+          document.getElementById('mensaje').style.display = "block";
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('resultado').style.display = "none";
+        document.getElementById('mensaje').style.display = "block";
+      }
+    }
+
+    // Event listeners para autocompletado
+    document.getElementById('nombre').addEventListener('input', function(e) {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        buscarSugerenciasPorNombre(e.target.value);
+      }, 300);
+    });
+    
+    document.getElementById('dni').addEventListener('input', function(e) {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        buscarSugerenciasPorDni(e.target.value);
+      }, 300);
+    });
+
+    // Permitir búsqueda al presionar Enter
+    document.getElementById('nombre').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('suggestions').style.display = 'none';
+        buscarPorNombre();
+      }
+    });
+    
+    document.getElementById('dni').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('dniSuggestions').style.display = 'none';
+        buscarPorDni();
+      }
+    });
+
+    // Ocultar sugerencias al hacer clic fuera
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('#suggestions') && !e.target.closest('#nombre')) {
+        document.getElementById('suggestions').style.display = 'none';
+      }
+      if (!e.target.closest('#dniSuggestions') && !e.target.closest('#dni')) {
+        document.getElementById('dniSuggestions').style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

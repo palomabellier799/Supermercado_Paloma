@@ -1,0 +1,25 @@
+codigo;descripcion;stock;precio
+000A;Leche entera;100;1200
+000B;Leche descremada;100;1300
+000C;Yerba 1kg;100;2500
+00AB;Yerba 1.5kg;100;3200
+00AC;Azucar;100;1100
+00BC;Te negro;100;900
+0ABC;Te de manzanilla;100;950
+0BCA;Café molido;100;2800
+0CAB;Café instantáneo;100;3000
+A0CB;Dulce de leche tradicional;100;1800
+B0CB;Dulce de leche repostero;100;1900
+C0BC;Mermelada de frutilla;100;1600
+CA0B;Mermelada de durazno;100;1600
+BA0C;Harina leudante;100;800
+AB0C;Harina 0000;100;780
+CB0A;Harina 000;100;750
+ACB0;Fideo tallarines;100;950
+ABC0;Arroz;100;900
+CBA0;Mayonesa;100;1400
+ABCD;Ketchup;100;1300
+BCAD;Mostaza;100;1200
+CDCA;Sal;100;500
+DABC;Vinagre;100;700
+ABDC;Aceite;100;2500

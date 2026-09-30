@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test API</title>
+  <style>
+    body { font-family: monospace; padding: 20px; }
+    pre { background: #f5f5f5; padding: 10px; border-radius: 5px; }
+    button { padding: 10px 20px; margin: 5px; }
+  </style>
+</head>
+<body>
+  <h1>Test API - Producto 000B</h1>
+  
+  <button onclick="testCaja()">Test Caja API</button>
+  <button onclick="testStock()">Test Stock API</button>
+  <button onclick="testDB()">Test DB Directo</button>
+  
+  <h2>Resultados:</h2>
+  <div id="resultado"></div>
+  
+  <script>
+    async function testCaja() {
+      const res = await fetch('/caja/api/producto?codigo=000B');
+      const data = await res.json();
+      document.getElementById('resultado').innerHTML = '<h3>Caja API:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+    }
+    
+    async function testStock() {
+      const res = await fetch('/stock/producto?codigo=000B');
+      const data = await res.json();
+      document.getElementById('resultado').innerHTML = '<h3>Stock API:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+    }
+    
+    async function testDB() {
+      const res = await fetch('/configuracion/diagnostico-precios');
+      const data = await res.json();
+      const prod000B = data.bd.productos.find(p => p.codigo === '000B');
+      document.getElementById('resultado').innerHTML = '<h3>DB Directo (000B):</h3><pre>' + JSON.stringify(prod000B, null, 2) + '</pre>';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscar productos - Sistema Stock</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #4f46e5;
+      --primary-hover: #4338ca;
+      --secondary-color: #10b981;
+      --secondary-hover: #059669;
+      --text-dark: #1f2937;
+      --text-light: #6b7280;
+      --bg-light: #f9fafb;
+      --card-bg: #ffffff;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --border-color: #e5e7eb;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+      color: var(--text-dark);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+    
+    .app-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    
+    .header h1 {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+    
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+    
+    .back-button:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .search-card {
+      background-color: var(--card-bg);
+      border-radius: 1rem;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    .search-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--text-dark);
+    }
+    
+    .search-form {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .search-input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-family: 'Poppins', sans-serif;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+    }
+    
+    .search-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    .search-button:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .results-card {
+      background-color: var(--card-bg);
+      border-radius: 1rem;
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      overflow: hidden;
+    }
+    
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    .results-table th {
+      background-color: #f9fafb;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--text-dark);
+      border-bottom: 2px solid var(--border-color);
+    }
+    
+    .results-table td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-light);
+    }
+    
+    .results-table tr:last-child td {
+      border-bottom: none;
+    }
+    
+    .results-table tr:hover td {
+      background-color: #f9fafb;
+    }
+    
+    .stock-badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    
+    .stock-high {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .stock-medium {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .stock-low {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    
+    .no-results {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-light);
+    }
+    
+    .no-results i {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      color: #d1d5db;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 2rem;
+    }
+    
+    .spinner {
+      display: inline-block;
+      width: 2rem;
+      height: 2rem;
+      border: 3px solid rgba(79, 70, 229, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .suggestions-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-top: none;
+      border-radius: 0 0 0.5rem 0.5rem;
+      box-shadow: var(--shadow);
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+    }
+    
+    .suggestion-item {
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s ease;
+    }
+    
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+    
+    .suggestion-item:hover {
+      background-color: #f9fafb;
+    }
+    
+    .suggestion-item.selected {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .suggestion-name {
+      font-weight: 500;
+      color: var(--text-dark);
+    }
+    
+    .suggestion-item.selected .suggestion-name {
+      color: white;
+    }
+    
+    .suggestion-code {
+      font-size: 0.875rem;
+      color: var(--text-light);
+      margin-top: 0.25rem;
+    }
+    
+    .suggestion-item.selected .suggestion-code {
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .suggestion-stock {
+      font-size: 0.875rem;
+      color: var(--secondary-color);
+      font-weight: 500;
+      margin-top: 0.25rem;
+    }
+    
+    .suggestion-item.selected .suggestion-stock {
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 1rem;
+      }
+      
+      .search-form {
+        flex-direction: column;
+      }
+      
+      .search-card, .results-card {
+        padding: 1.5rem;
+      }
+      
+      .results-table th, .results-table td {
+        padding: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <div class="header">
+      <h1>Sistema de Stock</h1>
+      <a href="/dashboard" class="back-button">
+        <i class="fas fa-arrow-left"></i> Volver al inicio
+      </a>
+    </div>
+    
+    <div class="search-card">
+      <h2 class="search-title">Buscar productos</h2>
+      <div class="search-form">
+        <div style="position: relative; flex: 1;">
+          <input type="text" id="nombre" class="search-input" placeholder="Ingrese nombre del producto (ej: leche, arroz, yerba...)" autofocus>
+          <div id="suggestions" class="suggestions-dropdown" style="display: none;"></div>
+        </div>
+        <button onclick="buscarPorNombre()" class="search-button">
+          <i class="fas fa-search"></i> Buscar por Nombre
+        </button>
+      </div>
+      <div class="search-form" style="margin-top: 1rem;">
+        <div style="position: relative; flex: 1;">
+          <input type="text" id="codigo" class="search-input" placeholder="Ingrese código del producto">
+          <div id="codigoSuggestions" class="suggestions-dropdown" style="display: none;"></div>
+        </div>
+        <button onclick="buscarPorCodigo()" class="search-button" style="background-color: var(--secondary-color);">
+          <i class="fas fa-barcode"></i> Buscar por Código
+        </button>
+      </div>
+    </div>
+    
+    <div class="results-card">
+      <table id="tabla" class="results-table">
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Stock actual</th>
+            <th>Stock inicial</th>
+          </tr>
+        </thead>
+        <tbody id="resultados">
+          <!-- Los resultados se cargarán aquí -->
+        </tbody>
+      </table>
+      
+      <div id="mensaje" class="no-results" style="display: none;">
+        <i class="fas fa-search"></i>
+        <p>No se encontraron productos que coincidan con tu búsqueda.</p>
+      </div>
+      
+      <div id="cargando" class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <p>Buscando productos...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentSuggestions = [];
+    let selectedSuggestionIndex = -1;
+    let searchTimeout;
+
+    // Función para mostrar resultados en la tabla
+    function mostrarResultados(productos) {
+      document.getElementById('cargando').style.display = 'none';
+      
+      if (!productos || productos.length === 0) {
+        document.getElementById('mensaje').style.display = 'block';
+        return;
+      }
+      
+      // Mostrar resultados en la tabla
+      const tbody = document.getElementById('resultados');
+      tbody.innerHTML = ''; // Limpiar resultados anteriores
+      
+      // Convertir a array si es un solo objeto
+      const productosArray = Array.isArray(productos) ? productos : [productos];
+      
+      productosArray.forEach(producto => {
+        const tr = document.createElement('tr');
+        
+        // Determinar clase de stock
+        let stockClass = '';
+        let stockLevel = parseInt(producto.stock);
+        if (stockLevel > 20) {
+          stockClass = 'stock-high';
+        } else if (stockLevel > 5) {
+          stockClass = 'stock-medium';
+        } else {
+          stockClass = 'stock-low';
+        }
+        
+        // Asegurar que precio sea un número
+        const precio = producto.precio ? parseFloat(producto.precio).toFixed(2) : '0.00';
+        const stockInicialMostrar = (producto.stock_inicial && parseInt(producto.stock_inicial) > 0) ? producto.stock_inicial : producto.stock;
+        
+        tr.innerHTML = `
+          <td>${producto.codigo}</td>
+          <td>${producto.descripcion}</td>
+          <td>$${precio}</td>
+          <td><span class="${stockClass}">${producto.stock}</span></td>
+          <td>${stockInicialMostrar}</td>
+        `;
+        
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Función para mostrar sugerencias de autocompletado
+    function mostrarSugerencias(sugerencias, containerId) {
+      const container = document.getElementById(containerId);
+      
+      if (!sugerencias || sugerencias.length === 0) {
+        container.style.display = 'none';
+        return;
+      }
+      
+      container.innerHTML = '';
+      currentSuggestions = sugerencias;
+      selectedSuggestionIndex = -1;
+      
+      sugerencias.forEach((sugerencia, index) => {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        item.innerHTML = `
+          <div class="suggestion-name">${sugerencia.descripcion}</div>
+          <div class="suggestion-code">Código: ${sugerencia.codigo}</div>
+          <div class="suggestion-stock">Stock: ${sugerencia.stock}</div>
+        `;
+        
+        item.addEventListener('click', () => {
+          seleccionarSugerencia(sugerencia, containerId);
+        });
+        
+        container.appendChild(item);
+      });
+      
+      container.style.display = 'block';
+    }
+
+    // Función para seleccionar una sugerencia
+    function seleccionarSugerencia(sugerencia, containerId) {
+      if (containerId === 'suggestions') {
+        document.getElementById('nombre').value = sugerencia.descripcion;
+        document.getElementById('suggestions').style.display = 'none';
+        // Mostrar información del producto seleccionado
+        mostrarResultados([sugerencia]);
+      } else if (containerId === 'codigoSuggestions') {
+        document.getElementById('codigo').value = sugerencia.codigo;
+        document.getElementById('codigoSuggestions').style.display = 'none';
+        // Mostrar información del producto seleccionado
+        mostrarResultados([sugerencia]);
+      }
+    }
+
+    // Función para buscar sugerencias por nombre
+    async function buscarSugerenciasPorNombre(nombre) {
+      if (nombre.length < 2) {
+        document.getElementById('suggestions').style.display = 'none';
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/stock/buscar?nombre=${encodeURIComponent(nombre)}&limit=5`);
+        const sugerencias = await response.json();
+        mostrarSugerencias(sugerencias, 'suggestions');
+      } catch (error) {
+        console.error('Error al buscar sugerencias:', error);
+        document.getElementById('suggestions').style.display = 'none';
+      }
+    }
+
+    // Función para buscar sugerencias por código
+    async function buscarSugerenciasPorCodigo(codigo) {
+      if (codigo.length < 1) {
+        document.getElementById('codigoSuggestions').style.display = 'none';
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/stock/buscar?nombre=${encodeURIComponent(codigo)}&limit=5`);
+        const sugerencias = await response.json();
+        // Filtrar por código que contenga el texto ingresado
+        const sugerenciasFiltradas = sugerencias.filter(s => 
+          s.codigo.toLowerCase().includes(codigo.toLowerCase())
+        );
+        mostrarSugerencias(sugerenciasFiltradas, 'codigoSuggestions');
+      } catch (error) {
+        console.error('Error al buscar sugerencias:', error);
+        document.getElementById('codigoSuggestions').style.display = 'none';
+      }
+    }
+    
+    // Función para buscar productos por nombre
+    function buscarPorNombre() {
+      const nombre = document.getElementById('nombre').value.trim();
+      if (!nombre) {
+        alert('Por favor ingrese un nombre de producto');
+        return;
+      }
+      
+      // Mostrar indicador de carga
+      document.getElementById('cargando').style.display = 'block';
+      document.getElementById('mensaje').style.display = 'none';
+      document.getElementById('resultados').innerHTML = '';
+      
+      // Realizar la búsqueda mediante fetch
+      console.log('Buscando:', nombre);
+      fetch(`/stock/buscar?nombre=${encodeURIComponent(nombre)}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Error en la búsqueda');
+          }
+          return response.json();
+        })
+        .then(productos => {
+          mostrarResultados(productos);
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById('cargando').style.display = 'none';
+          document.getElementById('mensaje').style.display = 'block';
+          document.getElementById('mensaje').innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Ocurrió un error al buscar productos. Por favor intente nuevamente.</p>
+          `;
+        });
+    }
+    
+    // Función para buscar productos por código
+    function buscarPorCodigo() {
+      const codigo = document.getElementById('codigo').value.trim();
+      if (!codigo) {
+        alert('Por favor ingrese un código de producto');
+        return;
+      }
+      
+      // Mostrar indicador de carga
+      document.getElementById('cargando').style.display = 'block';
+      document.getElementById('mensaje').style.display = 'none';
+      document.getElementById('resultados').innerHTML = '';
+      
+      // Realizar la búsqueda mediante fetch
+      console.log('Buscando por código:', codigo);
+      fetch(`/stock/producto?codigo=${encodeURIComponent(codigo)}`)
+        .then(response => {
+          if (response.status === 404) {
+            document.getElementById('cargando').style.display = 'none';
+            document.getElementById('mensaje').style.display = 'block';
+            document.getElementById('mensaje').innerHTML = `
+              <i class="fas fa-exclamation-circle"></i>
+              <p>No se encontró ningún producto con el código: ${codigo}</p>
+            `;
+            return null;
+          }
+          if (!response.ok) {
+            throw new Error('Error en la búsqueda');
+          }
+          return response.json();
+        })
+        .then(producto => {
+          if (producto) {
+            mostrarResultados(producto);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById('cargando').style.display = 'none';
+          document.getElementById('mensaje').style.display = 'block';
+          document.getElementById('mensaje').innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Ocurrió un error al buscar el producto: ${error.message}. Por favor intente nuevamente.</p>
+          `;
+        });
+    }
+    
+    // Event listeners para autocompletado
+    document.getElementById('nombre').addEventListener('input', function(e) {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        buscarSugerenciasPorNombre(e.target.value);
+      }, 300);
+    });
+    
+    document.getElementById('codigo').addEventListener('input', function(e) {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        buscarSugerenciasPorCodigo(e.target.value);
+      }, 300);
+    });
+
+    // Permitir búsqueda al presionar Enter
+    document.getElementById('nombre').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('suggestions').style.display = 'none';
+        buscarPorNombre();
+      }
+    });
+    
+    document.getElementById('codigo').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('codigoSuggestions').style.display = 'none';
+        buscarPorCodigo();
+      }
+    });
+
+    // Ocultar sugerencias al hacer clic fuera
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('#suggestions') && !e.target.closest('#nombre')) {
+        document.getElementById('suggestions').style.display = 'none';
+      }
+      if (!e.target.closest('#codigoSuggestions') && !e.target.closest('#codigo')) {
+        document.getElementById('codigoSuggestions').style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

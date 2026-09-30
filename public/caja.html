@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caja - Vender y Reponer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #1f2937; min-height: 100vh; padding: 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .header { display:flex; justify-content: space-between; align-items:center; margin-bottom:1.5rem; }
+    .card { background:#fff; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,.1); padding:1.5rem; margin-bottom:1rem; }
+    .row { display:grid; grid-template-columns: 1fr 1fr; gap:1rem; }
+    .controls { display:flex; gap:.5rem; }
+    .btn { padding:.6rem 1rem; border:none; border-radius:.5rem; background:#4f46e5; color:#fff; cursor:pointer; font-weight:600; }
+    .btn.secondary { background:#10b981; }
+    .btn.danger { background:#ef4444; }
+    input, select { padding:.6rem .8rem; border:1px solid #e5e7eb; border-radius:.5rem; width:100%; font-family:'Poppins', sans-serif; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { padding:.75rem; border-bottom:1px solid #e5e7eb; text-align:left; }
+    .right { text-align:right; }
+  </style>
+  </head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-cash-register"></i> Caja</h1>
+      <a class="btn danger" href="/dashboard"><i class="fas fa-arrow-left"></i> Volver</a>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <label>Buscar producto por nombre</label>
+          <input id="buscarNombre" placeholder="Ej: yerba, leche..." />
+        </div>
+        <div>
+          <label>Buscar producto por código</label>
+          <input id="buscarCodigo" placeholder="Ej: 001" />
+        </div>
+      </div>
+      <div id="resultados"></div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <div>
+          <label>DNI cliente</label>
+          <input id="dni" placeholder="DNI" />
+        </div>
+        <div class="controls">
+          <button class="btn" onclick="registrarVenta()"><i class="fas fa-shopping-cart"></i> Vender</button>
+          <button class="btn secondary" onclick="abrirReponer()"><i class="fas fa-plus"></i> Reponer</button>
+          <button class="btn danger" onclick="vaciarCarrito()"><i class="fas fa-trash"></i> Vaciar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Carrito</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Producto</th>
+            <th class="right">Precio</th>
+            <th class="right">Cantidad</th>
+            <th class="right">Subtotal</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="carritoBody"></tbody>
+        <tfoot>
+          <tr>
+            <th colspan="4" class="right">Total</th>
+            <th class="right" id="total">$0.00</th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let carrito = [];
+
+    function renderResultados(lista) {
+      const cont = document.getElementById('resultados');
+      if (!lista || lista.length === 0) { cont.innerHTML = '<p>No hay resultados.</p>'; return; }
+      cont.innerHTML = '<table><thead><tr><th>Código</th><th>Producto</th><th class="right">Stock actual</th><th class="right">Stock inicial</th><th class="right">Precio</th><th></th></tr></thead><tbody>' +
+        lista.map(p => {
+          const si = (p.stock_inicial && parseInt(p.stock_inicial)>0) ? p.stock_inicial : p.stock;
+          const pr = Number(p.precio||0);
+          return `<tr><td>${p.codigo}</td><td>${p.nombre}</td><td class=right>${p.stock}</td><td class=right>${si}</td><td class=right>$${pr.toFixed(2)}</td><td><button class=btn onclick='agregar(${JSON.stringify(p).replaceAll("'","&#39;")})'>Agregar</button></td></tr>`;
+        }).join('') +
+        '</tbody></table>';
+    }
+
+    function agregar(p) {
+      const existente = carrito.find(i => i.id === p.id);
+      if (existente) { existente.cantidad += 1; } else { carrito.push({ id: p.id, codigo: p.codigo, nombre: p.nombre, precio: p.precio||0, cantidad: 1 }); }
+      renderCarrito();
+    }
+
+    function quitar(idx) { carrito.splice(idx,1); renderCarrito(); }
+    function cambiarCantidad(idx, val) { carrito[idx].cantidad = Math.max(1, parseInt(val||1,10)); renderCarrito(); }
+
+    function renderCarrito() {
+      const tbody = document.getElementById('carritoBody');
+      tbody.innerHTML = '';
+      let total = 0;
+      carrito.forEach((it, idx) => {
+        const subtotal = (it.precio||0) * (it.cantidad||0);
+        total += subtotal;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${it.codigo}</td><td>${it.nombre}</td><td class=right><input type=number min=0 step=0.01 value='${Number(it.precio||0).toFixed(2)}' onchange='cambiarPrecio(${idx}, this.value)' style='width:100px' /></td><td class=right><input type=number min=1 value='${it.cantidad}' onchange='cambiarCantidad(${idx}, this.value)' style='width:80px' /></td><td class=right>$${totalLine(subtotal)}</td><td><button class='btn danger' onclick='quitar(${idx})'>Quitar</button></td>`;
+        tbody.appendChild(tr);
+      });
+      document.getElementById('total').textContent = '$' + total.toFixed(2);
+    }
+    function cambiarPrecio(idx, val){ carrito[idx].precio = Math.max(0, parseFloat(val||0)); renderCarrito(); }
+    function totalLine(n){ return Number(n||0).toFixed(2); }
+    function vaciarCarrito(){ carrito = []; renderCarrito(); }
+
+    async function buscar(tipo, valor){
+      const params = new URLSearchParams();
+      params.set(tipo, valor);
+      const r = await fetch('/caja/api/producto?' + params.toString());
+      const data = await r.json();
+      renderResultados(data);
+    }
+
+    document.getElementById('buscarNombre').addEventListener('input', e => { const v = e.target.value.trim(); if (v.length>=2) buscar('nombre', v); });
+    document.getElementById('buscarCodigo').addEventListener('input', e => { const v = e.target.value.trim(); if (v.length>=1) buscar('codigo', v); });
+
+    async function registrarVenta(){
+      const dni = document.getElementById('dni').value.trim();
+      if (!dni) { alert('Ingrese DNI'); return; }
+      if (carrito.length===0) { alert('Agregue productos'); return; }
+      const items = carrito.map(i=>({ productoId: i.id, cantidad: i.cantidad, precioUnitario: i.precio||0 }));
+      const r = await fetch('/caja/api/vender', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ dni, items }) });
+      const data = await r.json();
+      if (!r.ok){ alert(data.error||'Error al vender'); return; }
+      alert(`Venta OK. Total $${Number(data.total).toFixed(2)}. Puntos sumados: ${data.puntosSumados}`);
+      vaciarCarrito();
+    }
+
+    async function abrirReponer(){
+      const codigo = prompt('Código del producto a reponer:');
+      if (!codigo) return;
+      const qty = parseInt(prompt('Cantidad a ingresar:'),10)||0;
+      if (qty<=0) { alert('Cantidad inválida'); return; }
+      const r1 = await fetch('/caja/api/producto?codigo=' + encodeURIComponent(codigo));
+      const arr = await r1.json();
+      if (!arr || arr.length===0){ alert('Producto no encontrado'); return; }
+      const productoId = arr[0].id;
+      const r = await fetch('/caja/api/reponer', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ productoId, cantidad: qty }) });
+      const data = await r.json();
+      if (!r.ok){ alert(data.error||'Error al reponer'); return; }
+      alert('Stock actualizado');
+    }
+  </script>
+  </body>
+  </html>
+
+

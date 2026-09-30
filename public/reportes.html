@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #f3f4f6, #e5e7eb); color: #1f2937; min-height: 100vh; padding: 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .header { display:flex; justify-content: space-between; align-items:center; margin-bottom:1.5rem; }
+    .card { background:#fff; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,.1); padding:1.5rem; margin-bottom:1rem; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { padding:.75rem; border-bottom:1px solid #e5e7eb; text-align:left; }
+    .btn { padding:.6rem 1rem; border:none; border-radius:.5rem; background:#4f46e5; color:#fff; cursor:pointer; font-weight:600; text-decoration:none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-chart-line"></i> Reportes</h1>
+      <a class="btn" href="/dashboard"><i class="fas fa-arrow-left"></i> Volver</a>
+    </div>
+
+    <div class="card">
+      <h3>Ventas por día (últimos 30 días)</h3>
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Total</th></tr>
+        </thead>
+        <tbody id="ventasDiarias"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Top productos (por importe)</h3>
+      <table>
+        <thead>
+          <tr><th>Código</th><th>Producto</th><th>Unidades</th><th>Total</th></tr>
+        </thead>
+        <tbody id="topProductos"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h3>Top productos (por unidades)</h3>
+      <table>
+        <thead>
+          <tr><th>Código</th><th>Producto</th><th>Unidades</th></tr>
+        </thead>
+        <tbody id="topUnidades"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    async function cargar() {
+      const r1 = await fetch('/reportes/api/ventas-diarias');
+      const vd = await r1.json();
+      document.getElementById('ventasDiarias').innerHTML = vd.map(x=>`<tr><td>${x.fecha}</td><td>$${Number(x.total).toFixed(2)}</td></tr>`).join('');
+
+      const r2 = await fetch('/reportes/api/top-productos');
+      const tp = await r2.json();
+      document.getElementById('topProductos').innerHTML = tp.map(x=>`<tr><td>${x.codigo}</td><td>${x.nombre}</td><td>${x.unidades}</td><td>$${Number(x.total).toFixed(2)}</td></tr>`).join('');
+
+      const r3 = await fetch('/reportes/api/top-unidades');
+      const tu = await r3.json();
+      document.getElementById('topUnidades').innerHTML = tu.map(x=>`<tr><td>${x.codigo}</td><td>${x.nombre}</td><td>${x.unidades}</td></tr>`).join('');
+    }
+    cargar();
+  </script>
+</body>
+</html>
+
+

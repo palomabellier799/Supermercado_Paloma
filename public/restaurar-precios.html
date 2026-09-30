@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurar Precios desde CSV</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    button {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin: 10px 5px;
+    }
+    button:hover {
+      background: #4338ca;
+    }
+    button.secondary {
+      background: #10b981;
+    }
+    button.secondary:hover {
+      background: #059669;
+    }
+    #resultado {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 5px;
+      display: none;
+    }
+    .success {
+      background: #d1fae5;
+      color: #065f46;
+      border: 1px solid #10b981;
+    }
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #ef4444;
+    }
+    .info {
+      background: #dbeafe;
+      color: #1e40af;
+      border: 1px solid #3b82f6;
+    }
+    pre {
+      background: #f9fafb;
+      padding: 10px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🔧 Restaurar Precios desde CSV</h1>
+    <p>Esta herramienta forzará la actualización de TODOS los precios desde el archivo <code>productos.csv</code>.</p>
+    
+    <button onclick="diagnostico()">🔍 DIAGNÓSTICO Completo</button>
+    <button onclick="forzarPrecios()">🔄 FORZAR Actualización de Precios</button>
+    <button class="secondary" onclick="actualizarStock()">📦 Actualizar Stock y Precios</button>
+    <button class="secondary" onclick="verificarProducto()">🔍 Verificar Producto 000B</button>
+    
+    <div id="resultado"></div>
+  </div>
+
+  <script>
+    function mostrarResultado(mensaje, tipo = 'info') {
+      const div = document.getElementById('resultado');
+      div.className = tipo;
+      div.innerHTML = mensaje;
+      div.style.display = 'block';
+    }
+
+    async function forzarPrecios() {
+      mostrarResultado('⏳ Forzando actualización de precios desde CSV...', 'info');
+      
+      try {
+        const response = await fetch('/configuracion/forzar-precios-csv', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          mostrarResultado(`
+            <strong>✓ Precios actualizados exitosamente</strong><br>
+            Productos actualizados: ${data.productosActualizados}<br>
+            Total procesados: ${data.totalProcesados}<br>
+            <br>
+            <em>Ahora verifica en Caja y Control de Stock que los precios sean correctos.</em>
+          `, 'success');
+        } else {
+          mostrarResultado(`<strong>✗ Error:</strong> ${data.error}`, 'error');
+        }
+      } catch (error) {
+        mostrarResultado(`<strong>✗ Error de conexión:</strong> ${error.message}`, 'error');
+      }
+    }
+
+    async function actualizarStock() {
+      mostrarResultado('⏳ Actualizando stock y precios desde CSV...', 'info');
+      
+      try {
+        const response = await fetch('/configuracion/actualizar-stock', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          mostrarResultado(`
+            <strong>✓ Actualización completada</strong><br>
+            Productos procesados: ${data.productosProcesados}<br>
+            Precios actualizados: ${data.preciosActualizados}<br>
+          `, 'success');
+        } else {
+          mostrarResultado(`<strong>✗ Error:</strong> ${data.error}`, 'error');
+        }
+      } catch (error) {
+        mostrarResultado(`<strong>✗ Error de conexión:</strong> ${error.message}`, 'error');
+      }
+    }
+
+    async function diagnostico() {
+      mostrarResultado('⏳ Ejecutando diagnóstico completo...', 'info');
+      
+      try {
+        const response = await fetch('/configuracion/diagnostico-precios');
+        const data = await response.json();
+        
+        let html = '<strong>📊 DIAGNÓSTICO COMPLETO</strong><br><br>';
+        
+        // CSV
+        html += '<strong>CSV:</strong><br>';
+        html += `Existe: ${data.csv.existe ? '✓' : '✗'}<br>`;
+        html += `Productos encontrados: ${data.csv.productos.length}<br>`;
+        if (data.csv.productos.length > 0) {
+          html += '<br>Primeros 3 productos del CSV:<br>';
+          data.csv.productos.slice(0, 3).forEach(p => {
+            html += `&nbsp;&nbsp;${p.codigo}: "${p.precioRaw}" → ${p.precioParseado}<br>`;
+          });
+        }
+        
+        // BD
+        html += '<br><strong>Base de Datos:</strong><br>';
+        html += 'Columnas: ' + data.bd.esquema.map(c => c.nombre).join(', ') + '<br>';
+        html += `Productos: ${data.bd.productos.length}<br>`;
+        
+        // Comparación
+        html += '<br><strong>Comparación CSV vs BD:</strong><br>';
+        html += '<table style="width:100%; border-collapse: collapse; margin-top: 10px;">';
+        html += '<tr style="background: #f3f4f6;"><th style="padding:5px; border:1px solid #ddd;">Código</th><th style="padding:5px; border:1px solid #ddd;">CSV</th><th style="padding:5px; border:1px solid #ddd;">BD</th><th style="padding:5px; border:1px solid #ddd;">Estado</th></tr>';
+        data.comparacion.slice(0, 5).forEach(c => {
+          const color = c.coincide ? 'green' : 'red';
+          const icono = c.coincide ? '✓' : '✗';
+          html += `<tr><td style="padding:5px; border:1px solid #ddd;">${c.codigo}</td><td style="padding:5px; border:1px solid #ddd;">$${c.precioCSV}</td><td style="padding:5px; border:1px solid #ddd;">$${c.precioBD}</td><td style="padding:5px; border:1px solid #ddd; color:${color};">${icono}</td></tr>`;
+        });
+        html += '</table>';
+        
+        // Buscar 000B específicamente
+        const prod000B = data.comparacion.find(c => c.codigo === '000B');
+        if (prod000B) {
+          html += '<br><strong>Producto 000B:</strong><br>';
+          html += `CSV: $${prod000B.precioCSV}<br>`;
+          html += `BD: $${prod000B.precioBD}<br>`;
+          html += `Estado: ${prod000B.coincide ? '<span style="color:green;">✓ Correcto</span>' : '<span style="color:red;">✗ Incorrecto</span>'}`;
+        }
+        
+        mostrarResultado(html, 'info');
+      } catch (error) {
+        mostrarResultado(`<strong>✗ Error:</strong> ${error.message}`, 'error');
+      }
+    }
+
+    async function verificarProducto() {
+      mostrarResultado('⏳ Verificando producto 000B...', 'info');
+      
+      try {
+        // Verificar en caja
+        const responseCaja = await fetch('/caja/api/producto?codigo=000B');
+        const dataCaja = await responseCaja.json();
+        
+        // Verificar en stock
+        const responseStock = await fetch('/stock/producto?codigo=000B');
+        const dataStock = await responseStock.json();
+        
+        const precioCaja = dataCaja && dataCaja.length > 0 ? dataCaja[0].precio : 'No encontrado';
+        const precioStock = dataStock ? dataStock.precio : 'No encontrado';
+        
+        mostrarResultado(`
+          <strong>Producto 000B - Leche descremada</strong><br><br>
+          <strong>En Caja:</strong> $${precioCaja}<br>
+          <strong>En Stock:</strong> $${precioStock}<br>
+          <strong>Esperado (CSV):</strong> $1300<br>
+          <br>
+          ${precioCaja == 1300 && precioStock == 1300 ? 
+            '<span style="color: green;">✓ Precios correctos</span>' : 
+            '<span style="color: red;">✗ Precios incorrectos - Ejecuta "FORZAR Actualización"</span>'}
+        `, precioCaja == 1300 && precioStock == 1300 ? 'success' : 'error');
+      } catch (error) {
+        mostrarResultado(`<strong>✗ Error al verificar:</strong> ${error.message}`, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

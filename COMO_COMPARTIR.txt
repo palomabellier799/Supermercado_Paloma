@@ -1,0 +1,30 @@
+COMO COMPARTIR EL SISTEMA
+========================
+
+1. EN LA COMPUTADORA CON EL SERVIDOR:
+   - Ejecuta 'Iniciar Sistema.bat'
+   - Anota la dirección IP que aparece (ej: 192.168.1.100)
+   - Mantén la ventana del servidor abierta
+
+2. EN DISPOSITIVOS EN LA MISMA RED (celulares, tablets, otras PC):
+   - Conéctate a la misma red WiFi
+   - Abre el navegador y escribe:
+     http://[tu-ip]:3000/auth/login
+     (reemplaza [tu-ip] con la dirección IP que anotaste)
+
+3. SI NECESITAS ACCESO DESDE INTERNET:
+   Opción A - Configurar el router:
+   1. Accede a la configuración de tu router (generalmente 192.168.1.1 o 192.168.0.1)
+   2. Busca 'Port Forwarding' o 'Redirección de puertos'
+   3. Redirige el puerto externo 3000 al puerto 3000 de la IP local del servidor
+   4. Usa tu IP pública (puedes verla en https://www.cualesmiip.com/)
+
+   Opción B - Usar ngrok (más fácil):
+   1. Descarga ngrok desde https://ngrok.com/
+   2. Ejecuta: ngrok http 3000
+   3. Comparte la URL que te da (ej: https://abc123.ngrok.io)
+
+IMPORTANTE:
+- El servidor debe estar encendido para que otros puedan acceder
+- La seguridad depende de tu configuración de red
+- No compartas el acceso con personas no autorizadas
