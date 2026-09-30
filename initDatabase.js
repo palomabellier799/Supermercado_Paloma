@@ -4,7 +4,12 @@ const fs = require('fs');
 const csv = require('csv-parser');
 const path = require('path');
 
-const dbPath = path.join(__dirname, 'db', 'database.db');
+const dbDir = path.join(__dirname, 'db');
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+
+const dbPath = path.join(dbDir, 'database.db');
 console.log("Inicializando base de datos en:", dbPath);
 
 // Crear conexión
