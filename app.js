@@ -344,7 +344,7 @@ app.get('/dashboard', (req, res) => {
 
 // Inicio del servidor
 console.log('Iniciando el servidor...');
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const HOST = '0.0.0.0'; // Escuchar en todas las interfaces de red
 
 try {
