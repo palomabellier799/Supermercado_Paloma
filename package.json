@@ -4,7 +4,7 @@
   "description": "Sistema de gestión de stock y fidelización",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node initDatabase.js && node app.js",
     "init": "node initDatabase.js",
     "dev": "nodemon app.js"
   },
